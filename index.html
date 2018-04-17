@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <style>body {padding: 20px 40px;}</style>
+    </head>
+    <body>
+        <div id="stream"></div>
+
+        <script>
+         var messages = {}
+         var etag = null;
+         setInterval(function(){
+                         fetch("otvechat.txt", {cache: "force-cache", headers: {'If-None-Match': etag}})
+                             .then(function(response) {
+                                 etag = response.headers.get('Etag')
+                                 response.text().then(function(resp){
+                                     resp.split("\n").forEach((x)=>{
+                                         var parts = x.split("|"); 
+                                         var id = parts[0]
+                                         var msg = parts[1]
+                                         if(id && !messages[id]){
+                                             messages[id] = msg;
+                                             var node = document.createElement("div");                 // Create a <li> node
+                                             node.innerHTML = msg;
+                                             document.getElementById("stream").appendChild(node); 
+                                         }
+                                     })
+                                 })
+                             })
+                     }, 500);
+        </script>
+
+    </body>
+</html>
